@@ -1,15 +1,23 @@
 import re
+from threading import Lock
+from typing import Dict, List
+from bs4 import BeautifulSoup
+from bs4.element import Tag
 from consts import HtmlTags, AnimalWikiPageConsts, PICTURE_URL, ANIMAL_NAME
 from utils import get_html_page_by_url, download_image
 
 
-def parse_row(row, lock, animals_by_collateral_adjective):
+def parse_row(row: Tag, lock: Lock, animals_by_collateral_adjective: Dict[str, List[Dict[str, str]]]) -> None:
     """
     For each row in the table extracts parameters such as animal's name, image and collateral adjective
     updates the dictionary as follows:
 
-    {collateral_adjective_1 :{animal_name_1: animal_picture_path_1},{animal_name_2: animal_picture_path_2}}},
-    {collateral_adjective_2 :{animal_name_3: animal_picture_path_3}}
+    {
+        collateral_adjective_1 :[{ANIMAL_NAME : animal_name_1, PICTURE_URL : animal_picture_path_1},
+                                  {ANIMAL_NAME : animal_name_2, PICTURE_URL : animal_picture_path_2}],
+
+        collateral_adjective_2 : [{ANIMAL_NAME : animal_name_3, PICTURE_URL : animal_picture_path_3]
+    }
 
     :param row:
     :param lock:
@@ -26,7 +34,7 @@ def parse_row(row, lock, animals_by_collateral_adjective):
                 update_results(adjective, animal_picture_dict, lock, animals_by_collateral_adjective)
 
 
-def create_animal_picture_dict(tag):
+def create_animal_picture_dict(tag: Tag) -> Dict[str, str]:
     """
     extract from tag animal name and animal picture and update dictionary
     """
@@ -35,7 +43,7 @@ def create_animal_picture_dict(tag):
     return {ANIMAL_NAME: animal_name, PICTURE_URL: animal_image_path}
 
 
-def get_specific_animal_url(animal_link_tag):
+def get_specific_animal_url(animal_link_tag: Tag) -> str:
     """
     :param animal_link_tag:
     :return: url for animal picture
@@ -45,7 +53,7 @@ def get_specific_animal_url(animal_link_tag):
     return extract_picture_url(html_page_for_animal)
 
 
-def extract_picture_url(html_page):
+def extract_picture_url(html_page: BeautifulSoup) -> str:
     """
     :param html_page:
     :return: animal picture url
@@ -56,7 +64,7 @@ def extract_picture_url(html_page):
             return meta[HtmlTags.CONTENT]
 
 
-def get_collateral_adjective(fields):
+def get_collateral_adjective(fields: List[Tag]) -> List[str]:
     """
     :param fields:
     :return: collateral_adjective
@@ -66,7 +74,8 @@ def get_collateral_adjective(fields):
     return collateral_adjective_cleaned.split(" ")
 
 
-def update_results(adjective, animal_picture_dict, lock, animals_by_collateral_adjective):
+def update_results(adjective: str, animal_picture_dict: Dict[str, str], lock: Lock,
+                   animals_by_collateral_adjective: Dict[str, List[Dict[str, str]]]):
     """
     Updates the dictionary with the new data.
     If the key(adjective) already exists - we will add the new value(animal_picture_dict) to it,

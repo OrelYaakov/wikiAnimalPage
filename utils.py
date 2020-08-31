@@ -1,3 +1,4 @@
+from typing import Dict
 import requests
 from os.path import join
 from pathlib import Path
@@ -8,7 +9,7 @@ from consts import HTML_PARSER, DOWNLOAD_PICTURE_PATH, ANIMAL_NAME, PICTURE_URL
 
 
 @retry(Exception, delay=1, backoff=2, max_delay=4)
-def get_html_page_by_url(url):
+def get_html_page_by_url(url: str) -> BeautifulSoup:
     """
     :param url:
     :return: html page
@@ -18,7 +19,7 @@ def get_html_page_by_url(url):
 
 
 @retry(Exception, delay=1, backoff=2, max_delay=4)
-def download_image(url, animal_name):
+def download_image(url: str, animal_name: str) -> str:
     """
     :param url:
     :param animal_name:
@@ -34,7 +35,7 @@ def download_image(url, animal_name):
     return picture_path
 
 
-def print_dictionary(animals_by_collateral_adjective):
+def print_dictionary(animals_by_collateral_adjective: Dict) -> None:
     """
     Prints the dictionary as follows:
 
