@@ -1,8 +1,9 @@
 import os
 import tempfile
+from enum import Enum
 
 
-class HtmlTags(object):
+class HtmlTags(Enum):
     META = "meta"
     CONTENT = 'content'
     PROPERTY = 'property'
@@ -15,7 +16,7 @@ class HtmlTags(object):
     HREF = 'href'
 
 
-class AnimalWikiPageConsts(object):
+class AnimalWikiPageConsts(Enum):
     URL = "https://en.wikipedia.org/wiki/List_of_animal_names"
     HEAD_HTML = 'https://en.wikipedia.org'
     TABLE_CLASS = "wikitable sortable"
